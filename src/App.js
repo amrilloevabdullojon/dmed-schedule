@@ -86,22 +86,22 @@ const App = () => {
     }, [selectedRegion, selectedDistrict, selectedInstitution, tableData]);
 
     return (
-        <div className="font-sans bg-gray-100 min-h-screen">
-            <header className="bg-blue-600 text-white py-6 shadow-md">
+        <div className="font-sans bg-gradient-to-r from-blue-100 to-blue-50 min-h-screen transition-all duration-500 ease-in-out">
+            <header className="bg-blue-700 text-white py-6 shadow-md transition-all duration-500 ease-in-out hover:bg-blue-800">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-2xl font-bold">График обучения сотрудников по системе DMED</h1>
+                    <h1 className="text-3xl font-extrabold">График обучения сотрудников по системе DMED</h1>
                 </div>
             </header>
             <main className="container mx-auto px-4 py-6">
-                <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="bg-white shadow-lg rounded-lg p-6 mb-6 transition-shadow duration-300 ease-in-out hover:shadow-xl">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
                             <label htmlFor="region" className="block font-medium text-gray-700 mb-2">Регион:</label>
                             <select
                                 id="region"
                                 value={selectedRegion}
                                 onChange={(e) => setSelectedRegion(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
                             >
                                 <option value="">Выберите регион</option>
                                 {regions.map((region, index) => (
@@ -115,7 +115,7 @@ const App = () => {
                                 id="district"
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
                             >
                                 <option value="">Выберите район</option>
                                 {districts.map((district, index) => (
@@ -129,7 +129,7 @@ const App = () => {
                                 id="institution"
                                 value={selectedInstitution}
                                 onChange={(e) => setSelectedInstitution(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
                             >
                                 <option value="">Выберите учреждение</option>
                                 {institutions.map((institution, index) => (
@@ -142,37 +142,37 @@ const App = () => {
                         type="file"
                         accept=".xlsx, .xls"
                         onChange={handleFileUpload}
-                        className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
                     />
                 </div>
-                <table className="min-w-full bg-white shadow-md rounded-lg">
-                    <thead className="bg-blue-600 text-white">
+                <table className="min-w-full bg-white shadow-lg rounded-lg transition-all duration-300 ease-in-out">
+                    <thead className="bg-blue-700 text-white">
                         <tr>
-                            <th className="py-2 px-4 text-left">Регион</th>
-                            <th className="py-2 px-4 text-left">Район</th>
-                            <th className="py-2 px-4 text-left">Учреждение</th>
-                            <th className="py-2 px-4 text-left">Звено</th>
-                            <th className="py-2 px-4 text-left">День</th>
-                            <th className="py-2 px-4 text-left">Сеанс</th>
-                            <th className="py-2 px-4 text-left">Ответственный</th>
+                            <th className="py-3 px-4 text-left">Регион</th>
+                            <th className="py-3 px-4 text-left">Район</th>
+                            <th className="py-3 px-4 text-left">Учреждение</th>
+                            <th className="py-3 px-4 text-left">Звено</th>
+                            <th className="py-3 px-4 text-left">День</th>
+                            <th className="py-3 px-4 text-left">Сеанс</th>
+                            <th className="py-3 px-4 text-left">Ответственный</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredData.map((row, index) => (
-                            <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
-                                <td className="py-2 px-4">{row.region}</td>
-                                <td className="py-2 px-4">{row.district}</td>
-                                <td className="py-2 px-4">{row.institution}</td>
-                                <td className="py-2 px-4">{row.level}</td>
-                                <td className="py-2 px-4">{row.day}</td>
-                                <td className="py-2 px-4">{row.session}</td>
-                                <td className="py-2 px-4">{row.responsible}</td>
+                            <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : "bg-white transition-all duration-300 ease-in-out hover:bg-blue-50"}>
+                                <td className="py-3 px-4">{row.region}</td>
+                                <td className="py-3 px-4">{row.district}</td>
+                                <td className="py-3 px-4">{row.institution}</td>
+                                <td className="py-3 px-4">{row.level}</td>
+                                <td className="py-3 px-4">{row.day}</td>
+                                <td className="py-3 px-4">{row.session}</td>
+                                <td className="py-3 px-4">{row.responsible}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </main>
-            <footer className="bg-blue-600 text-white py-4">
+            <footer className="bg-blue-700 text-white py-4 transition-all duration-300 ease-in-out hover:bg-blue-800">
                 <div className="container mx-auto px-4 text-center">
                     &copy; 2024 График обучения сотрудников по системе DMED | Все права защищены
                 </div>

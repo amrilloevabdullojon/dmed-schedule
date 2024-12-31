@@ -11,7 +11,6 @@ const App = () => {
     const [selectedInstitution, setSelectedInstitution] = useState('');
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
-    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     const staticData = [
@@ -38,12 +37,6 @@ const App = () => {
 
         const uniqueRegions = [...new Set(formattedData.map(row => row.region))];
         setRegions(uniqueRegions);
-
-        const interval = setInterval(() => {
-            setCurrentTime(new Date().toLocaleTimeString());
-        }, 1000);
-
-        return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
@@ -95,7 +88,7 @@ const App = () => {
     };
 
     return (
-        <div className={isDarkMode ? "font-sans bg-gray-900 text-gray-200 min-h-screen flex flex-col" : "font-sans bg-gray-100 text-gray-900 min-h-screen flex flex-col"}>
+        <div className={isDarkMode ? "font-sans bg-gradient-to-r from-gray-800 to-black text-gray-200 min-h-screen flex flex-col" : "font-sans bg-gradient-to-r from-blue-100 to-white text-gray-900 min-h-screen flex flex-col"}>
             <header className={isDarkMode ? "bg-gray-800 text-white py-6 shadow-lg" : "bg-blue-700 text-white py-6 shadow-lg"}>
                 <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
                     <div className="flex items-center">
@@ -104,7 +97,6 @@ const App = () => {
                             {isDarkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-blue-300" />}
                         </button>
                     </div>
-                    <div className="text-lg md:text-xl mt-2 md:mt-0">Текущее время: {currentTime}</div>
                 </div>
             </header>
             <main className="container mx-auto px-4 md:px-6 py-8 flex-grow">
@@ -175,27 +167,27 @@ const App = () => {
                         </thead>
                         <tbody>
                             {filteredData.map((row, index) => (
-                                <tr key={index} className={index % 2 === 0 ? (isDarkMode ? "bg-gray-700" : "bg-gray-100") : (isDarkMode ? "bg-gray-600" : "bg-white transition duration-300 hover:bg-blue-50 border border-gray-200") }>
-                                    <td className="py-4 px-6 text-sm md:text-base">{row.region}</td>
-                                    <td className="py-4 px-6 text-sm md:text-base">{row.district}</td>
-                                    <td className="py-4 px-6 text-sm md:text-base">{row.institution}</td>
-                                    <td className="py-4 px-6 text-sm md:text-base">{row.level}</td>
-                                    <td className="py-4 px-6 text-sm md:text-base">{row.day}</td>
-                                    <td className="py-4 px-6 text-sm md:text-base">{row.session}</td>
-                                    <td className="py-4 px-6 text-sm md:text-base">{row.responsible}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </main>
-            <footer className="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-6">
-                <div className="container mx-auto px-4 text-center">
-                    Добро пожаловать на портал графика обучения сотрудников!
-                </div>
-            </footer>
-        </div>
-    );
+                                  <tr key={index} className={index % 2 === 0 ? (isDarkMode ? "bg-gray-700" : "bg-gray-100") : (isDarkMode ? "bg-gray-600" : "bg-white transition duration-300 hover:bg-blue-50") }>
+                                  <td className="py-4 px-6 text-sm md:text-base">{row.region}</td>
+                                  <td className="py-4 px-6 text-sm md:text-base">{row.district}</td>
+                                  <td className="py-4 px-6 text-sm md:text-base">{row.institution}</td>
+                                  <td className="py-4 px-6 text-sm md:text-base">{row.level}</td>
+                                  <td className="py-4 px-6 text-sm md:text-base">{row.day}</td>
+                                  <td className="py-4 px-6 text-sm md:text-base">{row.session}</td>
+                                  <td className="py-4 px-6 text-sm md:text-base">{row.responsible}</td>
+                              </tr>
+                          ))}
+                      </tbody>
+                  </table>
+              </div>
+          </main>
+          <footer className={isDarkMode ? "bg-gray-800 text-white py-6" : "bg-blue-700 text-white py-6"}>
+              <div className="container mx-auto px-4 text-center">
+                  Добро пожаловать на портал графика обучения сотрудников! Свяжитесь с нами: support@example.com
+              </div>
+          </footer>
+      </div>
+  );
 };
 
 export default App;

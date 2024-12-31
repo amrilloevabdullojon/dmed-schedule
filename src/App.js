@@ -12,7 +12,7 @@ const App = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-
+  
     const staticData = [
         { region: "город Ташкент", district: "Алмазарский район", institution: "Центральная больница", level: "Первичное звено", day: "Понедельник", session: "Утренний", responsible: "Иванов И.И." },
         { region: "город Ташкент", district: "Юнусабадский район", institution: "Школа №1", level: "Школьное звено", day: "Вторник", session: "Дневной", responsible: "Петров П.П." },
@@ -181,7 +181,7 @@ const App = () => {
             </main>
             <footer className="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-6 mt-auto">
                 <div className="container mx-auto px-4 text-center">
-                    &copy; 2024 График обучения сотрудников | Все права защищены
+                    Добро пожаловать на портал графика обучения сотрудников!
                 </div>
             </footer>
         </div>

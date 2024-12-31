@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
-import { FaMapMarkerAlt, FaBuilding, FaUniversity } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaBuilding, FaUniversity, FaSun, FaMoon } from 'react-icons/fa';
 
 const App = () => {
     const [regions, setRegions] = useState([]);
@@ -12,7 +12,8 @@ const App = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-  
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
     const staticData = [
         { region: "город Ташкент", district: "Алмазарский район", institution: "Центральная больница", level: "Первичное звено", day: "Понедельник", session: "Утренний", responsible: "Иванов И.И." },
         { region: "город Ташкент", district: "Юнусабадский район", institution: "Школа №1", level: "Школьное звено", day: "Вторник", session: "Дневной", responsible: "Петров П.П." },
@@ -89,26 +90,35 @@ const App = () => {
         }
     }, [selectedRegion, selectedDistrict, selectedInstitution, tableData]);
 
+    const toggleDarkMode = () => {
+        setIsDarkMode(!isDarkMode);
+    };
+
     return (
-        <div className="font-sans bg-gradient-to-r from-gray-100 to-gray-50 min-h-screen flex flex-col">
-            <header className="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-6 shadow-lg">
+        <div className={isDarkMode ? "font-sans bg-gray-900 text-gray-200 min-h-screen flex flex-col" : "font-sans bg-gray-100 text-gray-900 min-h-screen flex flex-col"}>
+            <header className={isDarkMode ? "bg-gray-800 text-white py-6 shadow-lg" : "bg-blue-700 text-white py-6 shadow-lg"}>
                 <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников</h1>
+                    <div className="flex items-center">
+                        <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников</h1>
+                        <button onClick={toggleDarkMode} className="ml-4 p-2 rounded-lg focus:outline-none">
+                            {isDarkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-blue-300" />}
+                        </button>
+                    </div>
                     <div className="text-lg md:text-xl mt-2 md:mt-0">Текущее время: {currentTime}</div>
                 </div>
             </header>
             <main className="container mx-auto px-4 md:px-6 py-8 flex-grow">
-                <div className="bg-white shadow-2xl rounded-lg p-6 md:p-8 mb-8">
+                <div className={isDarkMode ? "bg-gray-800 text-gray-200 shadow-2xl rounded-lg p-6 md:p-8 mb-8" : "bg-white text-gray-900 shadow-2xl rounded-lg p-6 md:p-8 mb-8 border border-gray-300"}>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-6">
                         <div>
-                            <label htmlFor="region" className="block font-semibold text-gray-800 mb-2">
+                            <label htmlFor="region" className={isDarkMode ? "block font-semibold text-gray-300 mb-2" : "block font-semibold text-gray-800 mb-2"}>
                                 <FaMapMarkerAlt className="inline-block mr-2" /> Регион:
                             </label>
                             <select
                                 id="region"
                                 value={selectedRegion}
                                 onChange={(e) => setSelectedRegion(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
+                                className={isDarkMode ? "w-full px-4 py-3 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300" : "w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"}
                             >
                                 <option value="">Выберите регион</option>
                                 {regions.map((region, index) => (
@@ -117,14 +127,14 @@ const App = () => {
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="district" className="block font-semibold text-gray-800 mb-2">
+                            <label htmlFor="district" className={isDarkMode ? "block font-semibold text-gray-300 mb-2" : "block font-semibold text-gray-800 mb-2"}>
                                 <FaBuilding className="inline-block mr-2" /> Район:
                             </label>
                             <select
                                 id="district"
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
+                                className={isDarkMode ? "w-full px-4 py-3 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300" : "w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"}
                             >
                                 <option value="">Выберите район</option>
                                 {districts.map((district, index) => (
@@ -133,14 +143,14 @@ const App = () => {
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="institution" className="block font-semibold text-gray-800 mb-2">
+                            <label htmlFor="institution" className={isDarkMode ? "block font-semibold text-gray-300 mb-2" : "block font-semibold text-gray-800 mb-2"}>
                                 <FaUniversity className="inline-block mr-2" /> Учреждение:
                             </label>
                             <select
                                 id="institution"
                                 value={selectedInstitution}
                                 onChange={(e) => setSelectedInstitution(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
+                                className={isDarkMode ? "w-full px-4 py-3 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300" : "w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"}
                             >
                                 <option value="">Выберите учреждение</option>
                                 {institutions.map((institution, index) => (
@@ -151,8 +161,8 @@ const App = () => {
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white shadow-xl rounded-lg">
-                        <thead className="bg-gray-800 text-white">
+                    <table className={isDarkMode ? "min-w-full bg-gray-800 text-gray-200 shadow-xl rounded-lg" : "min-w-full bg-white text-gray-800 shadow-xl rounded-lg border border-gray-300"}>
+                        <thead className={isDarkMode ? "bg-gray-700 text-gray-200" : "bg-blue-700 text-white"}>
                             <tr>
                                 <th className="py-4 px-6 text-left text-sm md:text-base">Регион</th>
                                 <th className="py-4 px-6 text-left text-sm md:text-base">Район</th>
@@ -165,7 +175,7 @@ const App = () => {
                         </thead>
                         <tbody>
                             {filteredData.map((row, index) => (
-                                <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : "bg-white transition duration-300 hover:bg-gray-50"}>
+                                <tr key={index} className={index % 2 === 0 ? (isDarkMode ? "bg-gray-700" : "bg-gray-100") : (isDarkMode ? "bg-gray-600" : "bg-white transition duration-300 hover:bg-blue-50 border border-gray-200") }>
                                     <td className="py-4 px-6 text-sm md:text-base">{row.region}</td>
                                     <td className="py-4 px-6 text-sm md:text-base">{row.district}</td>
                                     <td className="py-4 px-6 text-sm md:text-base">{row.institution}</td>
@@ -179,7 +189,7 @@ const App = () => {
                     </table>
                 </div>
             </main>
-            <footer className="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-6 mt-auto">
+            <footer className="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-6">
                 <div className="container mx-auto px-4 text-center">
                     Добро пожаловать на портал графика обучения сотрудников!
                 </div>

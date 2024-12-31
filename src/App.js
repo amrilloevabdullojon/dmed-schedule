@@ -3,7 +3,6 @@ import 'tailwindcss/tailwind.css';
 import { FaMapMarkerAlt, FaBuilding, FaUniversity } from 'react-icons/fa';
 import logo from './assets/logo.png';
 
-
 const App = () => {
     const [regions, setRegions] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -94,7 +93,7 @@ const App = () => {
         <div className={`font-sans ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} min-h-screen flex flex-col`}>
             <header className={isDarkMode ? "bg-gray-800 text-white py-6 shadow-lg" : "bg-blue-600 text-white py-6 shadow-lg"}>
                 <div className="container mx-auto px-4 flex flex-col items-center">
-                <img src={logo} alt="Логотип" className="h-16 mb-4" />
+                    <img src={logo} alt="Логотип" className="h-16 mb-4" />
                     <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников DMED</h1>
                     <button
                         onClick={() => setIsDarkMode(!isDarkMode)}
@@ -154,6 +153,19 @@ const App = () => {
                             ))}
                         </select>
                     </div>
+                </div>
+                <div className="md:hidden">
+                    {paginatedData.map((row, index) => (
+                        <div key={index} className="mb-4 p-4 border rounded-lg shadow-md bg-white text-gray-900">
+                            <p><strong>Регион:</strong> {row.region}</p>
+                            <p><strong>Район:</strong> {row.district}</p>
+                            <p><strong>Учреждение:</strong> {row.institution}</p>
+                            <p><strong>Звено:</strong> {row.level}</p>
+                            <p><strong>День:</strong> {row.day}</p>
+                            <p><strong>Сеанс:</strong> {row.session}</p>
+                            <p><strong>Ответственный:</strong> {row.responsible}</p>
+                        </div>
+                    ))}
                 </div>
                 <div className="hidden md:block overflow-x-auto">
                     <table className={`min-w-full ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'} shadow-xl rounded-lg`}>

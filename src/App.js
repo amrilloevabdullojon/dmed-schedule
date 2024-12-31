@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
 import { FaMapMarkerAlt, FaBuilding, FaUniversity } from 'react-icons/fa';
-import './style.css';
+
 const App = () => {
     const [regions, setRegions] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -90,17 +90,16 @@ const App = () => {
     }, [selectedRegion, selectedDistrict, selectedInstitution, tableData]);
 
     return (
-        <div className="font-sans bg-gradient-to-r from-blue-100 to-blue-50 min-h-screen flex flex-col relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 animate-gradient-background"></div>
-            <header className="bg-gradient-to-r from-blue-800 via-blue-600 to-blue-800 text-white py-8 shadow-lg relative z-10">
-                <div className="container mx-auto px-4 flex justify-between items-center">
-                    <h1 className="text-4xl font-bold">🎄 График обучения сотрудников 🎄</h1>
-                    <div className="text-xl">Текущее время: {currentTime}</div>
+        <div className="font-sans bg-gradient-to-r from-gray-100 to-gray-50 min-h-screen flex flex-col">
+            <header className="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-6 shadow-lg">
+                <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+                    <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников</h1>
+                    <div className="text-lg md:text-xl mt-2 md:mt-0">Текущее время: {currentTime}</div>
                 </div>
             </header>
-            <main className="container mx-auto px-6 py-8 flex-grow relative z-10">
-                <div className="bg-white shadow-2xl rounded-lg p-8 mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <main className="container mx-auto px-4 md:px-6 py-8 flex-grow">
+                <div className="bg-white shadow-2xl rounded-lg p-6 md:p-8 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-6">
                         <div>
                             <label htmlFor="region" className="block font-semibold text-gray-800 mb-2">
                                 <FaMapMarkerAlt className="inline-block mr-2" /> Регион:
@@ -109,7 +108,7 @@ const App = () => {
                                 id="region"
                                 value={selectedRegion}
                                 onChange={(e) => setSelectedRegion(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
                             >
                                 <option value="">Выберите регион</option>
                                 {regions.map((region, index) => (
@@ -125,7 +124,7 @@ const App = () => {
                                 id="district"
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
                             >
                                 <option value="">Выберите район</option>
                                 {districts.map((district, index) => (
@@ -141,7 +140,7 @@ const App = () => {
                                 id="institution"
                                 value={selectedInstitution}
                                 onChange={(e) => setSelectedInstitution(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300"
                             >
                                 <option value="">Выберите учреждение</option>
                                 {institutions.map((institution, index) => (
@@ -151,35 +150,36 @@ const App = () => {
                         </div>
                     </div>
                 </div>
-                <table className="w-full bg-white shadow-xl rounded-lg overflow-hidden relative z-10">
-                    <thead className="bg-blue-700 text-white">
-                        <tr>
-                            <th className="py-4 px-6 text-left">Регион</th>
-                            <th className="py-4 px-6 text-left">Район</th>
-                            <th className="py-4 px-6 text-left">Учреждение</th>
-                            <th className="py-4 px-6 text-left">Звено</th>
-                            <th className="py-4 px-6 text-left">День</th>
-                            <th className="py-4 px-6 text-left">Сеанс</th>
-                            <th className="py-4 px-6 text-left">Ответственный</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredData.map((row, index) => (
-                            <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : "bg-white transition duration-300 hover:bg-blue-50"}>
-                                <td className="py-4 px-6">{row.region}</td>
-                                <td className="py-4 px-6">{row.district}</td>
-                                <td className="py-4 px-6">{row.institution}</td>
-                                <td className="py-4 px-6">{row.level}</td>
-                                <td className="py-4 px-6">{row.day}</td>
-                                <td className="py-4 px-6">{row.session}</td>
-                                <td className="py-4 px-6">{row.responsible}</td>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white shadow-xl rounded-lg">
+                        <thead className="bg-gray-800 text-white">
+                            <tr>
+                                <th className="py-4 px-6 text-left text-sm md:text-base">Регион</th>
+                                <th className="py-4 px-6 text-left text-sm md:text-base">Район</th>
+                                <th className="py-4 px-6 text-left text-sm md:text-base">Учреждение</th>
+                                <th className="py-4 px-6 text-left text-sm md:text-base">Звено</th>
+                                <th className="py-4 px-6 text-left text-sm md:text-base">День</th>
+                                <th className="py-4 px-6 text-left text-sm md:text-base">Сеанс</th>
+                                <th className="py-4 px-6 text-left text-sm md:text-base">Ответственный</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {filteredData.map((row, index) => (
+                                <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : "bg-white transition duration-300 hover:bg-gray-50"}>
+                                    <td className="py-4 px-6 text-sm md:text-base">{row.region}</td>
+                                    <td className="py-4 px-6 text-sm md:text-base">{row.district}</td>
+                                    <td className="py-4 px-6 text-sm md:text-base">{row.institution}</td>
+                                    <td className="py-4 px-6 text-sm md:text-base">{row.level}</td>
+                                    <td className="py-4 px-6 text-sm md:text-base">{row.day}</td>
+                                    <td className="py-4 px-6 text-sm md:text-base">{row.session}</td>
+                                    <td className="py-4 px-6 text-sm md:text-base">{row.responsible}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </main>
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 animate-gradient-background"></div>
-            <footer className="bg-gradient-to-r from-blue-800 to-blue-700 text-white py-6 mt-auto relative z-10">
+            <footer className="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-6 mt-auto">
                 <div className="container mx-auto px-4 text-center">
                     &copy; 2024 График обучения сотрудников | Все права защищены
                 </div>

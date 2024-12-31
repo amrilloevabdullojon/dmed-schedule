@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
-import { FaMapMarkerAlt, FaBuilding, FaUniversity, FaSun, FaMoon } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaBuilding, FaUniversity } from 'react-icons/fa';
 
 const App = () => {
     const [regions, setRegions] = useState([]);
@@ -11,7 +11,8 @@ const App = () => {
     const [selectedInstitution, setSelectedInstitution] = useState('');
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     const staticData = [
         { region: "город Ташкент", district: "Алмазарский район", institution: "Центральная больница", level: "Первичное звено", day: "Понедельник", session: "Утренний", responsible: "Иванов И.И." },
@@ -44,14 +45,13 @@ const App = () => {
             const regionDistricts = tableData
                 .filter(row => row.region === selectedRegion)
                 .map(row => row.district);
-
-            const uniqueDistricts = [...new Set(regionDistricts)];
-            setDistricts(uniqueDistricts);
+            setDistricts([...new Set(regionDistricts)]);
+            setSelectedDistrict('');
+            setInstitutions([]);
         } else {
             setDistricts([]);
+            setInstitutions([]);
         }
-        setSelectedDistrict('');
-        setInstitutions([]);
     }, [selectedRegion, tableData]);
 
     useEffect(() => {
@@ -59,135 +59,170 @@ const App = () => {
             const districtInstitutions = tableData
                 .filter(row => row.region === selectedRegion && row.district === selectedDistrict)
                 .map(row => row.institution);
-
-            const uniqueInstitutions = [...new Set(districtInstitutions)];
-            setInstitutions(uniqueInstitutions);
+            setInstitutions([...new Set(districtInstitutions)]);
+            setSelectedInstitution('');
         } else {
             setInstitutions([]);
         }
-        setSelectedInstitution('');
     }, [selectedDistrict, selectedRegion, tableData]);
 
     useEffect(() => {
-        if (selectedRegion && selectedDistrict && selectedInstitution) {
-            const result = tableData.filter(
-                (row) =>
-                    row.region === selectedRegion &&
-                    row.district === selectedDistrict &&
-                    row.institution === selectedInstitution
-            );
-            setFilteredData([]);
-            setTimeout(() => setFilteredData(result), 200);
-        } else {
-            setFilteredData([]);
+        let filtered = tableData;
+
+        if (selectedRegion) {
+            filtered = filtered.filter(row => row.region === selectedRegion);
         }
+
+        if (selectedDistrict) {
+            filtered = filtered.filter(row => row.district === selectedDistrict);
+        }
+
+        if (selectedInstitution) {
+            filtered = filtered.filter(row => row.institution === selectedInstitution);
+        }
+
+        setFilteredData(filtered);
     }, [selectedRegion, selectedDistrict, selectedInstitution, tableData]);
 
-    const toggleDarkMode = () => {
-        setIsDarkMode(!isDarkMode);
+    const getDynamicBackground = () => {
+        const hour = new Date().getHours();
+        if (hour >= 6 && hour < 12) return 'bg-gradient-to-r from-yellow-300 to-blue-400'; // Morning
+        if (hour >= 12 && hour < 18) return 'bg-gradient-to-r from-blue-400 to-green-300'; // Afternoon
+        if (hour >= 18 && hour < 21) return 'bg-gradient-to-r from-orange-500 to-purple-600'; // Evening
+        return 'bg-gradient-to-r from-gray-800 to-black'; // Night
     };
 
+    const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
     return (
-        <div className={isDarkMode ? "font-sans bg-gradient-to-r from-gray-800 to-black text-gray-200 min-h-screen flex flex-col" : "font-sans bg-gradient-to-r from-blue-100 to-white text-gray-900 min-h-screen flex flex-col"}>
-            <header className={isDarkMode ? "bg-gray-800 text-white py-6 shadow-lg" : "bg-blue-700 text-white py-6 shadow-lg"}>
-                <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-                    <div className="flex items-center">
-                        <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников</h1>
-                        <button onClick={toggleDarkMode} className="ml-4 p-2 rounded-lg focus:outline-none">
-                            {isDarkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-blue-300" />}
-                        </button>
-                    </div>
+        <div className={`font-sans ${getDynamicBackground()} text-gray-900 min-h-screen flex flex-col`}>
+            <header className="bg-blue-700 text-white py-6 shadow-lg">
+                <div className="container mx-auto px-4 flex flex-col items-center">
+                    <img src="/logo.png" alt="Логотип" className="h-16 mb-4" />
+                    <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников DMED</h1>
                 </div>
             </header>
             <main className="container mx-auto px-4 md:px-6 py-8 flex-grow">
-                <div className={isDarkMode ? "bg-gray-800 text-gray-200 shadow-2xl rounded-lg p-6 md:p-8 mb-8" : "bg-white text-gray-900 shadow-2xl rounded-lg p-6 md:p-8 mb-8 border border-gray-300"}>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-6">
-                        <div>
-                            <label htmlFor="region" className={isDarkMode ? "block font-semibold text-gray-300 mb-2" : "block font-semibold text-gray-800 mb-2"}>
-                                <FaMapMarkerAlt className="inline-block mr-2" /> Регион:
-                            </label>
-                            <select
-                                id="region"
-                                value={selectedRegion}
-                                onChange={(e) => setSelectedRegion(e.target.value)}
-                                className={isDarkMode ? "w-full px-4 py-3 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300" : "w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"}
-                            >
-                                <option value="">Выберите регион</option>
-                                {regions.map((region, index) => (
-                                    <option key={index} value={region}>{region}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="district" className={isDarkMode ? "block font-semibold text-gray-300 mb-2" : "block font-semibold text-gray-800 mb-2"}>
-                                <FaBuilding className="inline-block mr-2" /> Район:
-                            </label>
-                            <select
-                                id="district"
-                                value={selectedDistrict}
-                                onChange={(e) => setSelectedDistrict(e.target.value)}
-                                className={isDarkMode ? "w-full px-4 py-3 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300" : "w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"}
-                            >
-                                <option value="">Выберите район</option>
-                                {districts.map((district, index) => (
-                                    <option key={index} value={district}>{district}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="institution" className={isDarkMode ? "block font-semibold text-gray-300 mb-2" : "block font-semibold text-gray-800 mb-2"}>
-                                <FaUniversity className="inline-block mr-2" /> Учреждение:
-                            </label>
-                            <select
-                                id="institution"
-                                value={selectedInstitution}
-                                onChange={(e) => setSelectedInstitution(e.target.value)}
-                                className={isDarkMode ? "w-full px-4 py-3 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300" : "w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"}
-                            >
-                                <option value="">Выберите учреждение</option>
-                                {institutions.map((institution, index) => (
-                                    <option key={index} value={institution}>{institution}</option>
-                                ))}
-                            </select>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div>
+                        <label htmlFor="region" className="block font-semibold text-gray-800 mb-2">
+                            <FaMapMarkerAlt className="inline-block mr-2" /> Регион:
+                        </label>
+                        <select
+                            id="region"
+                            value={selectedRegion}
+                            onChange={(e) => setSelectedRegion(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">Выберите регион</option>
+                            {regions.map((region, index) => (
+                                <option key={index} value={region}>{region}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="district" className="block font-semibold text-gray-800 mb-2">
+                            <FaBuilding className="inline-block mr-2" /> Район:
+                        </label>
+                        <select
+                            id="district"
+                            value={selectedDistrict}
+                            onChange={(e) => setSelectedDistrict(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">Выберите район</option>
+                            {districts.map((district, index) => (
+                                <option key={index} value={district}>{district}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="institution" className="block font-semibold text-gray-800 mb-2">
+                            <FaUniversity className="inline-block mr-2" /> Учреждение:
+                        </label>
+                        <select
+                            id="institution"
+                            value={selectedInstitution}
+                            onChange={(e) => setSelectedInstitution(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">Выберите учреждение</option>
+                            {institutions.map((institution, index) => (
+                                <option key={index} value={institution}>{institution}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className={isDarkMode ? "min-w-full bg-gray-800 text-gray-200 shadow-xl rounded-lg" : "min-w-full bg-white text-gray-800 shadow-xl rounded-lg border border-gray-300"}>
-                        <thead className={isDarkMode ? "bg-gray-700 text-gray-200" : "bg-blue-700 text-white"}>
+                <div className="block md:hidden">
+                    {paginatedData.map((row, index) => (
+                        <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg shadow-md">
+                            <p><strong>Регион:</strong> {row.region}</p>
+                            <p><strong>Район:</strong> {row.district}</p>
+                            <p><strong>Учреждение:</strong> {row.institution}</p>
+                            <p><strong>Звено:</strong> {row.level}</p>
+                            <p><strong>День:</strong> {row.day}</p>
+                            <p><strong>Сеанс:</strong> {row.session}</p>
+                            <p><strong>Ответственный:</strong> {row.responsible}</p>
+                        </div>
+                    ))}
+                </div>
+                <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full bg-white shadow-xl rounded-lg">
+                        <thead className="bg-blue-700 text-white">
                             <tr>
-                                <th className="py-4 px-6 text-left text-sm md:text-base">Регион</th>
-                                <th className="py-4 px-6 text-left text-sm md:text-base">Район</th>
-                                <th className="py-4 px-6 text-left text-sm md:text-base">Учреждение</th>
-                                <th className="py-4 px-6 text-left text-sm md:text-base">Звено</th>
-                                <th className="py-4 px-6 text-left text-sm md:text-base">День</th>
-                                <th className="py-4 px-6 text-left text-sm md:text-base">Сеанс</th>
-                                <th className="py-4 px-6 text-left text-sm md:text-base">Ответственный</th>
+                                <th className="py-4 px-6 text-left">Регион</th>
+                                <th className="py-4 px-6 text-left">Район</th>
+                                <th className="py-4 px-6 text-left">Учреждение</th>
+                                <th className="py-4 px-6 text-left">Звено</th>
+                                <th className="py-4 px-6 text-left">День</th>
+                                <th className="py-4 px-6 text-left">Сеанс</th>
+                                <th className="py-4 px-6 text-left">Ответственный</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredData.map((row, index) => (
-                                  <tr key={index} className={index % 2 === 0 ? (isDarkMode ? "bg-gray-700" : "bg-gray-100") : (isDarkMode ? "bg-gray-600" : "bg-white transition duration-300 hover:bg-blue-50") }>
-                                  <td className="py-4 px-6 text-sm md:text-base">{row.region}</td>
-                                  <td className="py-4 px-6 text-sm md:text-base">{row.district}</td>
-                                  <td className="py-4 px-6 text-sm md:text-base">{row.institution}</td>
-                                  <td className="py-4 px-6 text-sm md:text-base">{row.level}</td>
-                                  <td className="py-4 px-6 text-sm md:text-base">{row.day}</td>
-                                  <td className="py-4 px-6 text-sm md:text-base">{row.session}</td>
-                                  <td className="py-4 px-6 text-sm md:text-base">{row.responsible}</td>
-                              </tr>
-                          ))}
-                      </tbody>
-                  </table>
-              </div>
-          </main>
-          <footer className={isDarkMode ? "bg-gray-800 text-white py-6" : "bg-blue-700 text-white py-6"}>
-              <div className="container mx-auto px-4 text-center">
-                  Добро пожаловать на портал графика обучения сотрудников! Свяжитесь с нами: support@example.com
-              </div>
-          </footer>
-      </div>
-  );
+                            {paginatedData.map((row, index) => (
+                                <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : "bg-white transition duration-300 hover:bg-blue-50"}>
+                                    <td className="py-4 px-6">{row.region}</td>
+                                    <td className="py-4 px-6">{row.district}</td>
+                                    <td className="py-4 px-6">{row.institution}</td>
+                                    <td className="py-4 px-6">{row.level}</td>
+                                    <td className="py-4 px-6">{row.day}</td>
+                                    <td className="py-4 px-6">{row.session}</td>
+                                    <td className="py-4 px-6">{row.responsible}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600"
+                    >
+                        Назад
+                    </button>
+                    <span>Страница {currentPage} из {totalPages}</span>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600"
+                    >
+                        Вперед
+                    </button>
+                </div>
+            </main>
+            <footer className="bg-blue-700 text-white py-6">
+                <div className="container mx-auto px-4 text-center">
+                    <p>Добро пожаловать на портал графика обучения сотрудников!</p>
+                    <div className="mt-4">
+                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="mx-2 text-white hover:text-gray-300">Facebook</a>
+                        <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="mx-2 text-white hover:text-gray-300">Twitter</a>
+                        <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="mx-2 text-white hover:text-gray-300">LinkedIn</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
 };
 
 export default App;

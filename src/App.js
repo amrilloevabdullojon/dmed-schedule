@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
-import { FaMapMarkerAlt, FaBuilding, FaUniversity } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaBuilding, FaUniversity, FaSort } from 'react-icons/fa';
 
 const App = () => {
     const [regions, setRegions] = useState([]);
@@ -12,6 +12,7 @@ const App = () => {
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const itemsPerPage = 5;
 
     const staticData = [
@@ -84,36 +85,34 @@ const App = () => {
         setFilteredData(filtered);
     }, [selectedRegion, selectedDistrict, selectedInstitution, tableData]);
 
-    const getDynamicBackground = () => {
-        const hour = new Date().getHours();
-        if (hour >= 6 && hour < 12) return 'bg-gradient-to-r from-yellow-300 to-blue-400'; // Morning
-        if (hour >= 12 && hour < 18) return 'bg-gradient-to-r from-blue-400 to-green-300'; // Afternoon
-        if (hour >= 18 && hour < 21) return 'bg-gradient-to-r from-orange-500 to-purple-600'; // Evening
-        return 'bg-gradient-to-r from-gray-800 to-black'; // Night
-    };
-
     const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     return (
-        <div className={`font-sans ${getDynamicBackground()} text-gray-900 min-h-screen flex flex-col`}>
-            <header className="bg-blue-700 text-white py-6 shadow-lg">
+        <div className={`font-sans ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} min-h-screen flex flex-col`}>
+            <header className={isDarkMode ? "bg-gray-800 text-white py-6 shadow-lg" : "bg-blue-600 text-white py-6 shadow-lg"}>
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <img src="/logo.png" alt="Логотип" className="h-16 mb-4" />
                     <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников DMED</h1>
+                    <button
+                        onClick={() => setIsDarkMode(!isDarkMode)}
+                        className="mt-4 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 focus:outline-none"
+                    >
+                        {isDarkMode ? 'Светлая тема' : 'Тёмная тема'}
+                    </button>
                 </div>
             </header>
             <main className="container mx-auto px-4 md:px-6 py-8 flex-grow">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div>
-                        <label htmlFor="region" className="block font-semibold text-gray-800 mb-2">
+                        <label htmlFor="region" className="block font-semibold mb-2">
                             <FaMapMarkerAlt className="inline-block mr-2" /> Регион:
                         </label>
                         <select
                             id="region"
                             value={selectedRegion}
                             onChange={(e) => setSelectedRegion(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-4 py-3 border ${isDarkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         >
                             <option value="">Выберите регион</option>
                             {regions.map((region, index) => (
@@ -122,14 +121,14 @@ const App = () => {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="district" className="block font-semibold text-gray-800 mb-2">
+                        <label htmlFor="district" className="block font-semibold mb-2">
                             <FaBuilding className="inline-block mr-2" /> Район:
                         </label>
                         <select
                             id="district"
                             value={selectedDistrict}
                             onChange={(e) => setSelectedDistrict(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-4 py-3 border ${isDarkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         >
                             <option value="">Выберите район</option>
                             {districts.map((district, index) => (
@@ -138,14 +137,14 @@ const App = () => {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="institution" className="block font-semibold text-gray-800 mb-2">
+                        <label htmlFor="institution" className="block font-semibold mb-2">
                             <FaUniversity className="inline-block mr-2" /> Учреждение:
                         </label>
                         <select
                             id="institution"
                             value={selectedInstitution}
                             onChange={(e) => setSelectedInstitution(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-4 py-3 border ${isDarkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         >
                             <option value="">Выберите учреждение</option>
                             {institutions.map((institution, index) => (
@@ -156,7 +155,7 @@ const App = () => {
                 </div>
                 <div className="block md:hidden">
                     {paginatedData.map((row, index) => (
-                        <div key={index} className="mb-4 p-4 border border-gray-300 rounded-lg shadow-md">
+                        <div key={index} className={`mb-4 p-4 border ${isDarkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg shadow-md`}>
                             <p><strong>Регион:</strong> {row.region}</p>
                             <p><strong>Район:</strong> {row.district}</p>
                             <p><strong>Учреждение:</strong> {row.institution}</p>
@@ -168,8 +167,8 @@ const App = () => {
                     ))}
                 </div>
                 <div className="hidden md:block overflow-x-auto">
-                    <table className="min-w-full bg-white shadow-xl rounded-lg">
-                        <thead className="bg-blue-700 text-white">
+                    <table className={`min-w-full ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'} shadow-xl rounded-lg`}>
+                        <thead className={isDarkMode ? "bg-gray-700 text-white" : "bg-blue-600 text-white"}>
                             <tr>
                                 <th className="py-4 px-6 text-left">Регион</th>
                                 <th className="py-4 px-6 text-left">Район</th>
@@ -182,7 +181,7 @@ const App = () => {
                         </thead>
                         <tbody>
                             {paginatedData.map((row, index) => (
-                                <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : "bg-white transition duration-300 hover:bg-blue-50"}>
+                                <tr key={index} className={`${index % 2 === 0 ? (isDarkMode ? 'bg-gray-700' : 'bg-gray-100') : (isDarkMode ? 'bg-gray-600' : 'bg-white')} hover:bg-blue-100 transition duration-300`}>
                                     <td className="py-4 px-6">{row.region}</td>
                                     <td className="py-4 px-6">{row.district}</td>
                                     <td className="py-4 px-6">{row.institution}</td>
@@ -198,26 +197,26 @@ const App = () => {
                 <div className="flex justify-between items-center mt-4">
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600"
+                        className={`px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-blue-700 text-white hover:bg-blue-600'} rounded-lg`}
                     >
                         Назад
                     </button>
                     <span>Страница {currentPage} из {totalPages}</span>
                     <button
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600"
+                        className={`px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-blue-700 text-white hover:bg-blue-600'} rounded-lg`}
                     >
                         Вперед
                     </button>
                 </div>
             </main>
-            <footer className="bg-blue-700 text-white py-6">
+            <footer className={isDarkMode ? "bg-gray-900 text-gray-400 py-6" : "bg-blue-600 text-white py-6"}>
                 <div className="container mx-auto px-4 text-center">
                     <p>Добро пожаловать на портал графика обучения сотрудников!</p>
                     <div className="mt-4">
-                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="mx-2 text-white hover:text-gray-300">Facebook</a>
-                        <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="mx-2 text-white hover:text-gray-300">Twitter</a>
-                        <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="mx-2 text-white hover:text-gray-300">LinkedIn</a>
+                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-gray-300">Facebook</a>
+                        <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-gray-300">Twitter</a>
+                        <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-gray-300">LinkedIn</a>
                     </div>
                 </div>
             </footer>

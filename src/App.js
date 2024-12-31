@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
-import { FaMapMarkerAlt, FaBuilding, FaUniversity, FaSort } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaBuilding, FaUniversity } from 'react-icons/fa';
+import logo from './assets/logo.png';
+
 
 const App = () => {
     const [regions, setRegions] = useState([]);
@@ -92,7 +94,7 @@ const App = () => {
         <div className={`font-sans ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} min-h-screen flex flex-col`}>
             <header className={isDarkMode ? "bg-gray-800 text-white py-6 shadow-lg" : "bg-blue-600 text-white py-6 shadow-lg"}>
                 <div className="container mx-auto px-4 flex flex-col items-center">
-                    <img src="/logo.png" alt="Логотип" className="h-16 mb-4" />
+                <img src={logo} alt="Логотип" className="h-16 mb-4" />
                     <h1 className="text-3xl md:text-4xl font-bold text-center">График обучения сотрудников DMED</h1>
                     <button
                         onClick={() => setIsDarkMode(!isDarkMode)}
@@ -153,19 +155,6 @@ const App = () => {
                         </select>
                     </div>
                 </div>
-                <div className="block md:hidden">
-                    {paginatedData.map((row, index) => (
-                        <div key={index} className={`mb-4 p-4 border ${isDarkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg shadow-md`}>
-                            <p><strong>Регион:</strong> {row.region}</p>
-                            <p><strong>Район:</strong> {row.district}</p>
-                            <p><strong>Учреждение:</strong> {row.institution}</p>
-                            <p><strong>Звено:</strong> {row.level}</p>
-                            <p><strong>День:</strong> {row.day}</p>
-                            <p><strong>Сеанс:</strong> {row.session}</p>
-                            <p><strong>Ответственный:</strong> {row.responsible}</p>
-                        </div>
-                    ))}
-                </div>
                 <div className="hidden md:block overflow-x-auto">
                     <table className={`min-w-full ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'} shadow-xl rounded-lg`}>
                         <thead className={isDarkMode ? "bg-gray-700 text-white" : "bg-blue-600 text-white"}>
@@ -181,7 +170,7 @@ const App = () => {
                         </thead>
                         <tbody>
                             {paginatedData.map((row, index) => (
-                                <tr key={index} className={`${index % 2 === 0 ? (isDarkMode ? 'bg-gray-700' : 'bg-gray-100') : (isDarkMode ? 'bg-gray-600' : 'bg-white')} hover:bg-blue-100 transition duration-300`}>
+                                <tr key={index} className={`${index % 2 === 0 ? (isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-blue-50') : (isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-blue-100')} transition duration-300`}>
                                     <td className="py-4 px-6">{row.region}</td>
                                     <td className="py-4 px-6">{row.district}</td>
                                     <td className="py-4 px-6">{row.institution}</td>

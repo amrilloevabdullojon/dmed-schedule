@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
-import { FaMapMarkerAlt, FaBuilding, FaUniversity } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaBuilding, FaUniversity, FaSearch } from 'react-icons/fa';
 import logo from './assets/logo.png';
+import staticData from './part_1.json';
 
 const App = () => {
     const [regions, setRegions] = useState([]);
@@ -10,20 +11,12 @@ const App = () => {
     const [selectedRegion, setSelectedRegion] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [selectedInstitution, setSelectedInstitution] = useState('');
+    const [searchInstitution, setSearchInstitution] = useState('');
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const itemsPerPage = 5;
-
-    const staticData = [
-        { region: "город Ташкент", district: "Алмазарский район", institution: "Центральная больница", level: "Первичное звено", day: "Понедельник", session: "Утренний", responsible: "Иванов И.И." },
-        { region: "город Ташкент", district: "Юнусабадский район", institution: "Школа №1", level: "Школьное звено", day: "Вторник", session: "Дневной", responsible: "Петров П.П." },
-        { region: "Андижанская область", district: "Андижанский район", institution: "Поликлиника №7", level: "Вторичное звено", day: "Среда", session: "Вечерний", responsible: "Сидоров С.С." },
-        { region: "Бухарская область", district: "Бухарский район", institution: "Гимназия №3", level: "Школьное звено", day: "Четверг", session: "Утренний", responsible: "Кузнецов К.К." },
-        { region: "Джизакская область", district: "Зарбдорский район", institution: "Университет №2", level: "Высшее образование", day: "Пятница", session: "Дневной", responsible: "Михайлов М.М." },
-        { region: "Самаркандская область", district: "Самаркандский район", institution: "Центр здоровья", level: "Первичное звено", day: "Суббота", session: "Вечерний", responsible: "Фёдоров Ф.Ф." }
-    ];
 
     useEffect(() => {
         const formattedData = staticData.map(row => ({
@@ -32,7 +25,6 @@ const App = () => {
             institution: row.institution || '-',
             level: row.level || '-',
             day: row.day || '-',
-            session: row.session || '-',
             responsible: row.responsible || '-'
         }));
 
@@ -69,25 +61,26 @@ const App = () => {
     }, [selectedDistrict, selectedRegion, tableData]);
 
     useEffect(() => {
-        let filtered = tableData;
-
-        if (selectedRegion) {
-            filtered = filtered.filter(row => row.region === selectedRegion);
-        }
-
-        if (selectedDistrict) {
-            filtered = filtered.filter(row => row.district === selectedDistrict);
-        }
-
-        if (selectedInstitution) {
-            filtered = filtered.filter(row => row.institution === selectedInstitution);
-        }
-
+        const filtered = tableData.filter(row => {
+            return (
+                (!selectedRegion || row.region === selectedRegion) &&
+                (!selectedDistrict || row.district === selectedDistrict) &&
+                (!selectedInstitution || row.institution === selectedInstitution) &&
+                (!searchInstitution || row.institution.toLowerCase().includes(searchInstitution.toLowerCase()))
+            );
+        });
         setFilteredData(filtered);
-    }, [selectedRegion, selectedDistrict, selectedInstitution, tableData]);
+        setCurrentPage(1);
+    }, [selectedRegion, selectedDistrict, selectedInstitution, searchInstitution, tableData]);
 
     const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
 
     return (
         <div className={`font-sans ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} min-h-screen flex flex-col`}>
@@ -153,16 +146,28 @@ const App = () => {
                             ))}
                         </select>
                     </div>
+                    <div>
+                        <label htmlFor="searchInstitution" className="block font-semibold mb-2">
+                            <FaSearch className="inline-block mr-2" /> Поиск:
+                        </label>
+                        <input
+                            type="text"
+                            id="searchInstitution"
+                            value={searchInstitution}
+                            onChange={(e) => setSearchInstitution(e.target.value)}
+                            placeholder="Введите название учреждения"
+                            className={`w-full px-4 py-3 border ${isDarkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                    </div>
                 </div>
                 <div className="md:hidden">
                     {paginatedData.map((row, index) => (
-                        <div key={index} className="mb-4 p-4 border rounded-lg shadow-md bg-white text-gray-900">
+                        <div key={index} className={`mb-4 p-4 border rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
                             <p><strong>Регион:</strong> {row.region}</p>
                             <p><strong>Район:</strong> {row.district}</p>
                             <p><strong>Учреждение:</strong> {row.institution}</p>
                             <p><strong>Звено:</strong> {row.level}</p>
                             <p><strong>День:</strong> {row.day}</p>
-                            <p><strong>Сеанс:</strong> {row.session}</p>
                             <p><strong>Ответственный:</strong> {row.responsible}</p>
                         </div>
                     ))}
@@ -176,7 +181,6 @@ const App = () => {
                                 <th className="py-4 px-6 text-left">Учреждение</th>
                                 <th className="py-4 px-6 text-left">Звено</th>
                                 <th className="py-4 px-6 text-left">День</th>
-                                <th className="py-4 px-6 text-left">Сеанс</th>
                                 <th className="py-4 px-6 text-left">Ответственный</th>
                             </tr>
                         </thead>
@@ -188,7 +192,6 @@ const App = () => {
                                     <td className="py-4 px-6">{row.institution}</td>
                                     <td className="py-4 px-6">{row.level}</td>
                                     <td className="py-4 px-6">{row.day}</td>
-                                    <td className="py-4 px-6">{row.session}</td>
                                     <td className="py-4 px-6">{row.responsible}</td>
                                 </tr>
                             ))}
@@ -197,14 +200,14 @@ const App = () => {
                 </div>
                 <div className="flex justify-between items-center mt-4">
                     <button
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() => handlePageChange(currentPage - 1)}
                         className={`px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-blue-700 text-white hover:bg-blue-600'} rounded-lg`}
                     >
                         Назад
                     </button>
                     <span>Страница {currentPage} из {totalPages}</span>
                     <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        onClick={() => handlePageChange(currentPage + 1)}
                         className={`px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-blue-700 text-white hover:bg-blue-600'} rounded-lg`}
                     >
                         Вперед

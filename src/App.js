@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import 'tailwindcss/tailwind.css';
 import { FaMapMarkerAlt, FaBuilding, FaUniversity, FaSearch, FaSun, FaMoon, FaRedo } from 'react-icons/fa';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './animations.css';
 import logo from './assets/logo.png';
 import staticData from './part_1.json';
 
@@ -8,15 +12,21 @@ const App = () => {
     const [regions, setRegions] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [institutions, setInstitutions] = useState([]);
-    const [selectedRegion, setSelectedRegion] = useState(localStorage.getItem('selectedRegion') || '');
-    const [selectedDistrict, setSelectedDistrict] = useState(localStorage.getItem('selectedDistrict') || '');
-    const [selectedInstitution, setSelectedInstitution] = useState(localStorage.getItem('selectedInstitution') || '');
+    const [selectedRegion, setSelectedRegion] = useState('');
+    const [selectedDistrict, setSelectedDistrict] = useState('');
+    const [selectedInstitution, setSelectedInstitution] = useState('');
     const [searchInstitution, setSearchInstitution] = useState('');
-    const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [isDarkMode, setIsDarkMode] = useState(JSON.parse(localStorage.getItem('isDarkMode')) || false);
     const itemsPerPage = 5;
+    const nodeRefs = useRef([]);
+
+    const paginatedData = filteredData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     useEffect(() => {
         const formattedData = staticData.map(row => ({
@@ -29,7 +39,7 @@ const App = () => {
             responsible: row.responsible || '-'
         }));
 
-        setTableData(formattedData);
+        setFilteredData(formattedData);
 
         const uniqueRegions = [...new Set(formattedData.map(row => row.region))];
         setRegions(uniqueRegions);
@@ -37,7 +47,7 @@ const App = () => {
 
     useEffect(() => {
         if (selectedRegion) {
-            const regionDistricts = tableData
+            const regionDistricts = staticData
                 .filter(row => row.region === selectedRegion)
                 .map(row => row.district);
             setDistricts([...new Set(regionDistricts)]);
@@ -47,12 +57,11 @@ const App = () => {
             setDistricts([]);
             setInstitutions([]);
         }
-        localStorage.setItem('selectedRegion', selectedRegion);
-    }, [selectedRegion, tableData]);
+    }, [selectedRegion]);
 
     useEffect(() => {
         if (selectedDistrict) {
-            const districtInstitutions = tableData
+            const districtInstitutions = staticData
                 .filter(row => row.region === selectedRegion && row.district === selectedDistrict)
                 .map(row => row.institution);
             setInstitutions([...new Set(districtInstitutions)]);
@@ -60,15 +69,38 @@ const App = () => {
         } else {
             setInstitutions([]);
         }
-        localStorage.setItem('selectedDistrict', selectedDistrict);
-    }, [selectedDistrict, selectedRegion, tableData]);
+    }, [selectedDistrict, selectedRegion]);
+
+    const notify = (message, type = 'success') => {
+        if (type === 'success') {
+            toast.success(message);
+        } else if (type === 'error') {
+            toast.error(message);
+        } else {
+            toast.info(message);
+        }
+    };
+
+    const resetFilters = () => {
+        setSelectedRegion('');
+        setSelectedDistrict('');
+        setSelectedInstitution('');
+        setSearchInstitution('');
+        setFilteredData(staticData);
+        setCurrentPage(1);
+        notify('Фильтры сброшены!', 'info');
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        } else {
+            notify('Неверная страница!', 'error');
+        }
+    };
 
     useEffect(() => {
-        localStorage.setItem('selectedInstitution', selectedInstitution);
-    }, [selectedInstitution]);
-
-    useEffect(() => {
-        const filtered = tableData.filter(row => {
+        const filtered = staticData.filter(row => {
             return (
                 (!selectedRegion || row.region === selectedRegion) &&
                 (!selectedDistrict || row.district === selectedDistrict) &&
@@ -78,32 +110,11 @@ const App = () => {
         });
         setFilteredData(filtered);
         setCurrentPage(1);
-    }, [selectedRegion, selectedDistrict, selectedInstitution, searchInstitution, tableData]);
-
-    const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= totalPages) {
-            setCurrentPage(newPage);
-        }
-    };
-
-    const toggleTheme = () => {
-        const newTheme = !isDarkMode;
-        setIsDarkMode(newTheme);
-        localStorage.setItem('isDarkMode', JSON.stringify(newTheme));
-    };
-
-    const resetFilters = () => {
-        setSelectedRegion('');
-        setSelectedDistrict('');
-        setSelectedInstitution('');
-        setSearchInstitution('');
-    };
+    }, [selectedRegion, selectedDistrict, selectedInstitution, searchInstitution]);
 
     return (
         <div className={`font-sans ${isDarkMode ? 'bg-gradient-to-br from-gray-800 via-gray-900 to-black text-gray-100' : 'bg-gradient-to-br from-blue-100 via-white to-gray-50 text-gray-900'} min-h-screen flex flex-col transition-all duration-300`}>
+            <ToastContainer />
             <header className={isDarkMode ? "bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-white py-6 shadow-lg transition-all duration-300" : "bg-gradient-to-r from-blue-500 to-blue-700 text-white py-6 shadow-lg transition-all duration-300"}>
                 <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
                     <div className="flex items-center justify-center md:justify-start">
@@ -112,7 +123,12 @@ const App = () => {
                     </div>
                     <div className="mt-4 md:mt-0 flex justify-center md:justify-end space-x-4">
                         <button
-                            onClick={toggleTheme}
+                            onClick={() => {
+                                const newTheme = !isDarkMode;
+                                setIsDarkMode(newTheme);
+                                localStorage.setItem('isDarkMode', JSON.stringify(newTheme));
+                                notify(`Тема изменена на ${newTheme ? 'тёмную' : 'светлую'}!`, 'info');
+                            }}
                             className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 focus:outline-none shadow-lg transform hover:scale-105 transition-transform duration-300"
                         >
                             {isDarkMode ? <FaSun className="text-yellow-500" /> : <FaMoon className="text-blue-300" />}
@@ -191,20 +207,34 @@ const App = () => {
                     </div>
                 </div>
                 <div className="block md:hidden space-y-4">
-                    {paginatedData.map((row, index) => (
-                        <div
-                            key={index}
-                            className={`mb-4 p-4 border rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 ${isDarkMode ? 'bg-gray-800 text-gray-100 border-gray-700' : 'bg-white text-gray-900 border-gray-300'}`}
-                        >
-                            <p><strong>Регион:</strong> {row.region}</p>
-                            <p><strong>Район:</strong> {row.district}</p>
-                            <p><strong>Учреждение:</strong> {row.institution}</p>
-                            <p><strong>Звено:</strong> {row.level}</p>
-                            <p><strong>День:</strong> {row.day}</p>
-                            <p><strong>Сессия:</strong> {row.session}</p>
-                            <p><strong>Ответственный:</strong> {row.responsible}</p>
-                        </div>
-                    ))}
+                    <TransitionGroup component="div">
+                        {paginatedData.map((row, index) => {
+                            if (!nodeRefs.current[index]) {
+                                nodeRefs.current[index] = React.createRef();
+                            }
+                            return (
+                                <CSSTransition
+                                    key={index}
+                                    timeout={500}
+                                    classNames="fade"
+                                    nodeRef={nodeRefs.current[index]}
+                                >
+                                    <div
+                                        ref={nodeRefs.current[index]}
+                                        className={`mb-4 p-4 border rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 ${isDarkMode ? 'bg-gray-800 text-gray-100 border-gray-700' : 'bg-white text-gray-900 border-gray-300'}`}
+                                    >
+                                        <p><strong>Регион:</strong> {row.region}</p>
+                                        <p><strong>Район:</strong> {row.district}</p>
+                                        <p><strong>Учреждение:</strong> {row.institution}</p>
+                                        <p><strong>Звено:</strong> {row.level}</p>
+                                        <p><strong>День:</strong> {row.day}</p>
+                                        <p><strong>Сессия:</strong> {row.session}</p>
+                                        <p><strong>Ответственный:</strong> {row.responsible}</p>
+                                    </div>
+                                </CSSTransition>
+                            );
+                        })}
+                    </TransitionGroup>
                 </div>
                 <div className="hidden md:block overflow-x-auto">
                     <table className={`min-w-full ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'} shadow-xl rounded-lg transition-all duration-300 animate-fade-in`}>
@@ -219,22 +249,34 @@ const App = () => {
                                 <th className="py-4 px-6 text-left">Ответственный</th>
                             </tr>
                         </thead>
-                        <tbody className="animate-fade-in">
-                            {paginatedData.map((row, index) => (
-                                <tr
-                                    key={index}
-                                    className={`transition duration-300 ${index % 2 === 0 ? (isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-blue-50') : (isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-blue-100')}`}
-                                >
-                                    <td className="py-4 px-6">{row.region}</td>
-                                    <td className="py-4 px-6">{row.district}</td>
-                                    <td className="py-4 px-6">{row.institution}</td>
-                                    <td className="py-4 px-6">{row.level}</td>
-                                    <td className="py-4 px-6">{row.day}</td>
-                                    <td className="py-4 px-6">{row.session}</td>
-                                    <td className="py-4 px-6">{row.responsible}</td>
-                                </tr>
-                            ))}
-                        </tbody>
+                        <TransitionGroup component="tbody">
+                            {paginatedData.map((row, index) => {
+                                if (!nodeRefs.current[index]) {
+                                    nodeRefs.current[index] = React.createRef();
+                                }
+                                return (
+                                    <CSSTransition
+                                        key={index}
+                                        timeout={500}
+                                        classNames="fade"
+                                        nodeRef={nodeRefs.current[index]}
+                                    >
+                                        <tr
+                                            ref={nodeRefs.current[index]}
+                                            className={`transition duration-300 ${index % 2 === 0 ? (isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-blue-50') : (isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-blue-100')}`}
+                                        >
+                                            <td className="py-4 px-6">{row.region}</td>
+                                            <td className="py-4 px-6">{row.district}</td>
+                                            <td className="py-4 px-6">{row.institution}</td>
+                                            <td className="py-4 px-6">{row.level}</td>
+                                            <td className="py-4 px-6">{row.day}</td>
+                                            <td className="py-4 px-6">{row.session}</td>
+                                            <td className="py-4 px-6">{row.responsible}</td>
+                                        </tr>
+                                    </CSSTransition>
+                                );
+                            })}
+                        </TransitionGroup>
                     </table>
                 </div>
                 <div className="flex justify-between items-center mt-4">
@@ -268,4 +310,3 @@ const App = () => {
 };
 
 export default App;
-

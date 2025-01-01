@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
 import { FaMapMarkerAlt, FaBuilding, FaUniversity, FaSearch, FaSun, FaMoon, FaRedo } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
@@ -19,8 +18,7 @@ const App = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [isDarkMode, setIsDarkMode] = useState(JSON.parse(localStorage.getItem('isDarkMode')) || false);
-    const itemsPerPage = 5;
-    const nodeRefs = useRef([]);
+    const itemsPerPage = 8;
 
     const paginatedData = filteredData.slice(
         (currentPage - 1) * itemsPerPage,
@@ -206,80 +204,19 @@ const App = () => {
                         />
                     </div>
                 </div>
-                <div className="block md:hidden space-y-4">
-                    <TransitionGroup component="div">
-                        {paginatedData.map((row, index) => {
-                            if (!nodeRefs.current[index]) {
-                                nodeRefs.current[index] = React.createRef();
-                            }
-                            return (
-                                <CSSTransition
-                                    key={index}
-                                    timeout={500}
-                                    classNames="fade"
-                                    nodeRef={nodeRefs.current[index]}
-                                >
-                                    <div
-                                        ref={nodeRefs.current[index]}
-                                        className={`mb-4 p-4 border rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 ${isDarkMode ? 'bg-gray-800 text-gray-100 border-gray-700' : 'bg-white text-gray-900 border-gray-300'}`}
-                                    >
-                                        <p><strong>Регион:</strong> {row.region}</p>
-                                        <p><strong>Район:</strong> {row.district}</p>
-                                        <p><strong>Учреждение:</strong> {row.institution}</p>
-                                        <p><strong>Звено:</strong> {row.level}</p>
-                                        <p><strong>День:</strong> {row.day}</p>
-                                        <p><strong>Сессия:</strong> {row.session}</p>
-                                        <p><strong>Ответственный:</strong> {row.responsible}</p>
-                                    </div>
-                                </CSSTransition>
-                            );
-                        })}
-                    </TransitionGroup>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {paginatedData.map((row, index) => (
+                        <div key={index} className={`p-4 border rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-100 border-gray-700' : 'bg-white text-gray-900 border-gray-300'} transition-transform transform hover:scale-105`}>
+                            <h3 className="text-lg font-bold mb-2">{row.institution}</h3>
+                            <p className="text-sm"><strong>Регион:</strong> {row.region}</p>
+                            <p className="text-sm"><strong>Район:</strong> {row.district}</p>
+                            <p className="text-sm"><strong>Звено:</strong> {row.level}</p>
+                            <p className="text-sm"><strong>День:</strong> {row.day}</p>
+                            <p className="text-sm"><strong>Ответственный:</strong> {row.responsible}</p>
+                        </div>
+                    ))}
                 </div>
-                <div className="hidden md:block overflow-x-auto">
-                    <table className={`min-w-full ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'} shadow-xl rounded-lg transition-all duration-300 animate-fade-in`}>
-                        <thead className={isDarkMode ? "bg-gray-700 text-white transition-all duration-300" : "bg-blue-600 text-white transition-all duration-300"}>
-                            <tr>
-                                <th className="py-4 px-6 text-left">Регион</th>
-                                <th className="py-4 px-6 text-left">Район</th>
-                                <th className="py-4 px-6 text-left">Учреждение</th>
-                                <th className="py-4 px-6 text-left">Звено</th>
-                                <th className="py-4 px-6 text-left">День</th>
-                                <th className="py-4 px-6 text-left">Сессия</th>
-                                <th className="py-4 px-6 text-left">Ответственный</th>
-                            </tr>
-                        </thead>
-                        <TransitionGroup component="tbody">
-                            {paginatedData.map((row, index) => {
-                                if (!nodeRefs.current[index]) {
-                                    nodeRefs.current[index] = React.createRef();
-                                }
-                                return (
-                                    <CSSTransition
-                                        key={index}
-                                        timeout={500}
-                                        classNames="fade"
-                                        nodeRef={nodeRefs.current[index]}
-                                    >
-                                        <tr
-                                            ref={nodeRefs.current[index]}
-                                            className={`transition duration-300 ${index % 2 === 0 ? (isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-blue-50') : (isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-blue-100')}`}
-                                        >
-                                            <td className="py-4 px-6">{row.region}</td>
-                                            <td className="py-4 px-6">{row.district}</td>
-                                            <td className="py-4 px-6">{row.institution}</td>
-                                            <td className="py-4 px-6">{row.level}</td>
-                                            <td className="py-4 px-6">{row.day}</td>
-                                            <td className="py-4 px-6">{row.session}</td>
-                                            <td className="py-4 px-6">{row.responsible}</td>
-                                        </tr>
-                                    </CSSTransition>
-                                );
-                            })}
-                        </TransitionGroup>
-                    </table>
-                </div>
-                <div className="flex justify-between items-center mt-4">
+                <div className="flex justify-between items-center mt-6">
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         className={`px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-blue-700 text-white hover:bg-blue-600'} rounded-lg`}

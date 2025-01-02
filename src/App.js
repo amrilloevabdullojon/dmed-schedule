@@ -127,7 +127,7 @@ const App = () => {
                                 localStorage.setItem('isDarkMode', JSON.stringify(newTheme));
                                 notify(`Тема изменена на ${newTheme ? 'тёмную' : 'светлую'}!`, 'info');
                             }}
-                            className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 focus:outline-none shadow-lg transform hover:scale-105 transition-transform duration-300"
+                            className={`px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-blue-600 hover:bg-blue-500'} text-white shadow-lg transform hover:scale-105 transition-transform duration-300`}
                         >
                             {isDarkMode ? <FaSun className="text-yellow-500" /> : <FaMoon className="text-blue-300" />}
                         </button>
@@ -141,7 +141,7 @@ const App = () => {
                 </div>
             </header>
             <main className="container mx-auto px-4 md:px-6 py-8 flex-grow transition-all duration-300">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
                     <div>
                         <label htmlFor="region" className="block font-semibold mb-2">
                             <FaMapMarkerAlt className="inline-block mr-2" /> Регион:
@@ -206,7 +206,7 @@ const App = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {paginatedData.map((row, index) => (
-                        <div key={index} className={`p-4 border rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-100 border-gray-700' : 'bg-white text-gray-900 border-gray-300'} transition-transform transform hover:scale-105`}>
+                        <div key={index} className={`p-4 border rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-100 border-gray-700' : 'bg-white text-gray-900 border-gray-300'} transition-transform transform hover:scale-105 flex flex-col min-w-0 flex-grow`}>
                             <h3 className="text-lg font-bold mb-2">{row.institution}</h3>
                             <p className="text-sm"><strong>Регион:</strong> {row.region}</p>
                             <p className="text-sm"><strong>Район:</strong> {row.district}</p>
